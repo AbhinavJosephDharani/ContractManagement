@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import ServiceRequestForm from './ServiceRequestForm'
+import AdminDashboard from './AdminDashboard'
 
 function BackendHealth() {
   const [status, setStatus] = useState({ ok: false, message: 'unknown' })
@@ -32,14 +33,31 @@ function BackendHealth() {
 }
 
 export default function App() {
+  const [page, setPage] = useState('submit') // 'submit' or 'admin'
+
   return (
     <div className="app">
-      <header className="header" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+      <header className="header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:20}}>
         <h1>Anna Johnson — Home Cleaning Service</h1>
-        <BackendHealth />
+        <div style={{display:'flex',gap:12,alignItems:'center'}}>
+          <button 
+            onClick={() => setPage('submit')}
+            style={{padding:'8px 16px',borderRadius:6,border: page === 'submit' ? '2px solid #3498db' : '1px solid #ccc',background: page === 'submit' ? '#ecf0f1' : 'white',cursor:'pointer'}}
+          >
+            Submit Request
+          </button>
+          <button 
+            onClick={() => setPage('admin')}
+            style={{padding:'8px 16px',borderRadius:6,border: page === 'admin' ? '2px solid #3498db' : '1px solid #ccc',background: page === 'admin' ? '#ecf0f1' : 'white',cursor:'pointer'}}
+          >
+            Admin Panel
+          </button>
+          <BackendHealth />
+        </div>
       </header>
       <main className="container">
-        <ServiceRequestForm />
+        {page === 'submit' && <ServiceRequestForm />}
+        {page === 'admin' && <AdminDashboard />}
       </main>
     </div>
   )
