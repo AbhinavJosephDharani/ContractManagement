@@ -1,10 +1,13 @@
 const fs = require('fs')
 const path = require('path')
 
-const dataPath = path.join(process.cwd(), 'backend', 'data.json')
+// Use same /tmp storage used by other handlers
+const tmpDir = path.join('/tmp', 'contract-management-backend')
+const dataPath = path.join(tmpDir, 'data.json')
 
 function readData() {
   try {
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
     if (!fs.existsSync(dataPath)) fs.writeFileSync(dataPath, JSON.stringify([]))
     const raw = fs.readFileSync(dataPath, 'utf8')
     return JSON.parse(raw || '[]')
