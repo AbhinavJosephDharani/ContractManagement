@@ -42,12 +42,44 @@ export default function ServiceRequestForm() {
     setMessage('')
   }
 
-  function handleSubmit(e) {
+  async function sendToBackend(payload) {
+    try {
+      const base = import.meta.env.VITE_API_BASE
+      const res = await fetch(`${base.replace(/\/$/, '')}/requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const body = await res.json()
+      return { ok: true, body }
+    } catch (err) {
+      console.error('Backend request failed', err)
+      return { ok: false, error: String(err) }
+    }
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault()
     const payload = { ...form, photos: photos.map(f => f.name) }
     console.log('Service Request submitted:', payload)
 
-    // persist to localStorage
+    const apiBase = import.meta.env.VITE_API_BASE
+    if (apiBase) {
+      setMessage('Sending request to backend...')
+      const result = await sendToBackend(payload)
+      if (result.ok) {
+        const record = result.body
+        const next = [record, ...saved]
+        setSaved(next)
+        setMessage('Service request submitted to backend successfully.')
+        return
+      } else {
+        setMessage('Backend submit failed — saved locally instead.')
+      }
+    }
+
+    // fallback: persist to localStorage
     try {
       const existing = JSON.parse(localStorage.getItem('serviceRequests') || '[]')
       const record = { id: Date.now(), createdAt: new Date().toISOString(), ...payload }
