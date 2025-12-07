@@ -10,10 +10,10 @@ function BackendHealth() {
       return
     }
     try {
-      const res = await fetch(`${base.replace(/\/$/, '')}/health`)
+      const res = await fetch(`${base.replace(/\/$/, '')}/api/health`)
       if (!res.ok) throw new Error(await res.text())
       const data = await res.json()
-      setStatus({ ok: data.status === 'ok' && data.db === true, message: data.status })
+      setStatus({ ok: data.status === 'ok' && data.storage === true, message: data.status })
     } catch (err) {
       setStatus({ ok: false, message: String(err) })
     }

@@ -18,6 +18,12 @@ function writeData(arr) {
 }
 
 module.exports = function handler(req, res) {
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  if (req.method === 'OPTIONS') return res.status(204).end()
+
   if (req.method === 'GET') {
     const items = readData()
     return res.status(200).json(items.slice(0, 100))

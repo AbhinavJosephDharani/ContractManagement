@@ -42,9 +42,9 @@ export default function ServiceRequestForm() {
     setMessage('')
   }
 
-  async function sendToBackend(payload) {
+  async function sendToBackend(payload, apiBaseOverride) {
     try {
-      const base = import.meta.env.VITE_API_BASE
+      const base = apiBaseOverride || import.meta.env.VITE_API_BASE
       const res = await fetch(`${base.replace(/\/$/, '')}/requests`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,7 +67,8 @@ export default function ServiceRequestForm() {
     const apiBase = import.meta.env.VITE_API_BASE
     if (apiBase) {
       setMessage('Sending request to backend...')
-      const result = await sendToBackend(payload)
+      // ensure we call the serverless path
+      const result = await sendToBackend(payload, `${apiBase.replace(/\/$/, '')}/api`)
       if (result.ok) {
         const record = result.body
         const next = [record, ...saved]
