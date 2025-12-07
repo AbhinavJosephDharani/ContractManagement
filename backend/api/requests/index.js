@@ -1,67 +1,54 @@
-const fs = require('fs')
-const path = require('path')
+const { MongoClient } = require('mongodb')
 
-// Use a writable tmp path for serverless environments (Vercel)
-const tmpDir = path.join('/tmp', 'contract-management-backend')
-const dataPath = path.join(tmpDir, 'data.json')
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://<db_username>:<db_password>@cluster0.gwciiyr.mongodb.net/?appName=Cluster0'
 
-function readData() {
-  try {
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
-    if (!fs.existsSync(dataPath)) fs.writeFileSync(dataPath, JSON.stringify([]))
-    const raw = fs.readFileSync(dataPath, 'utf8')
-    return JSON.parse(raw || '[]')
-  } catch (err) {
-    return []
-  }
-}
-
-function writeData(arr) {
-  if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
-  fs.writeFileSync(dataPath, JSON.stringify(arr, null, 2))
-}
-
-module.exports = function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(204).end()
 
-  if (req.method === 'GET') {
-    const items = readData()
-    return res.status(200).json(items.slice(0, 100))
-  }
+  let client
+  try {
+    client = new MongoClient(mongoUri)
+    await client.connect()
+    const db = client.db('contract_management')
+    const collection = db.collection('requests')
 
-  if (req.method === 'POST') {
-    const body = req.body || {}
-    const items = readData()
-    const id = Date.now()
-    const record = {
-      id,
-      createdAt: new Date().toISOString(),
-      firstName: body.firstName || null,
-      lastName: body.lastName || null,
-      address: body.address || null,
-      phone: body.phone || null,
-      email: body.email || null,
-      cleaningType: body.cleaningType || null,
-      rooms: body.rooms || null,
-      preferredDate: body.preferredDate || null,
-      preferredTime: body.preferredTime || null,
-      budget: body.budget || null,
-      notes: body.notes || null,
-      photos: Array.isArray(body.photos) ? body.photos : []
+    if (req.method === 'GET') {
+      const items = await collection.find({}).sort({ createdAt: -1 }).limit(100).toArray()
+      return res.status(200).json(items)
     }
-    items.unshift(record)
-    try {
-      writeData(items)
-      return res.status(201).json(record)
-    } catch (err) {
-      return res.status(500).json({ error: String(err) })
-    }
-  }
 
-  res.setHeader('Allow', 'GET, POST')
-  res.status(405).end('Method Not Allowed')
+    if (req.method === 'POST') {
+      const body = req.body || {}
+      const record = {
+        createdAt: new Date().toISOString(),
+        firstName: body.firstName || null,
+        lastName: body.lastName || null,
+        address: body.address || null,
+        phone: body.phone || null,
+        email: body.email || null,
+        cleaningType: body.cleaningType || null,
+        rooms: body.rooms || null,
+        preferredDate: body.preferredDate || null,
+        preferredTime: body.preferredTime || null,
+        budget: body.budget || null,
+        notes: body.notes || null,
+        photos: Array.isArray(body.photos) ? body.photos : []
+      }
+      const result = await collection.insertOne(record)
+      const inserted = { _id: result.insertedId, ...record }
+      return res.status(201).json(inserted)
+    }
+
+    res.setHeader('Allow', 'GET, POST')
+    res.status(405).end('Method Not Allowed')
+  } catch (err) {
+    console.error('MongoDB error:', err)
+    return res.status(500).json({ error: String(err) })
+  } finally {
+    if (client) await client.close()
+  }
 }
