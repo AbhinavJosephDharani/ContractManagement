@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function ServiceRequestForm() {
   const [form, setForm] = useState({
@@ -16,6 +16,16 @@ export default function ServiceRequestForm() {
   })
   const [photos, setPhotos] = useState([])
   const [message, setMessage] = useState('')
+  const [saved, setSaved] = useState([])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('serviceRequests')
+      if (raw) setSaved(JSON.parse(raw))
+    } catch (e) {
+      console.warn('Failed to load saved requests', e)
+    }
+  }, [])
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -36,7 +46,19 @@ export default function ServiceRequestForm() {
     e.preventDefault()
     const payload = { ...form, photos: photos.map(f => f.name) }
     console.log('Service Request submitted:', payload)
-    setMessage('Service request saved locally. Ready to connect to backend.')
+
+    // persist to localStorage
+    try {
+      const existing = JSON.parse(localStorage.getItem('serviceRequests') || '[]')
+      const record = { id: Date.now(), createdAt: new Date().toISOString(), ...payload }
+      const next = [record, ...existing]
+      localStorage.setItem('serviceRequests', JSON.stringify(next))
+      setSaved(next)
+      setMessage('Service request saved locally (in browser). Ready to connect to backend.')
+    } catch (err) {
+      console.error('Failed to save request', err)
+      setMessage('Failed to save locally — see console for details.')
+    }
   }
 
   return (
@@ -119,6 +141,23 @@ export default function ServiceRequestForm() {
       </div>
 
       {message && <p className="message">{message}</p>}
+      {saved.length > 0 && (
+        <section style={{marginTop:20}}>
+          <h3>Saved Requests (local)</h3>
+          <div style={{display:'grid',gap:8}}>
+            {saved.map(r => (
+              <div key={r.id} style={{padding:10,background:'#fbfbfd',border:'1px solid #eee',borderRadius:6}}>
+                <strong>{r.firstName} {r.lastName}</strong> — {r.cleaningType} — {r.rooms} rooms
+                <div style={{fontSize:12,color:'#666'}}>{new Date(r.createdAt).toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:10}}>
+            <button type="button" onClick={() => { navigator.clipboard?.writeText(JSON.stringify(saved, null, 2)); setMessage('Saved requests copied to clipboard') }}>Copy JSON</button>
+            <button type="button" style={{marginLeft:8}} onClick={() => { localStorage.removeItem('serviceRequests'); setSaved([]); setMessage('Cleared saved requests') }}>Clear</button>
+          </div>
+        </section>
+      )}
     </form>
   )
 }
