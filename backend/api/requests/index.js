@@ -11,7 +11,12 @@ module.exports = async function handler(req, res) {
 
   let client
   try {
-    client = new MongoClient(mongoUri)
+    const options = {
+      maxPoolSize: 1,
+      tls: true,
+      retryWrites: true
+    }
+    client = new MongoClient(mongoUri, options)
     await client.connect()
     const db = client.db('contract_management')
     const collection = db.collection('requests')

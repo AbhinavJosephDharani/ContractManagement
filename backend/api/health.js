@@ -12,7 +12,14 @@ module.exports = async function handler(req, res) {
   // health check: verify MongoDB connectivity
   let client
   try {
-    client = new MongoClient(mongoUri, { serverSelectionTimeoutMS: 5000, socketTimeoutMS: 5000 })
+    const options = {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 5000,
+      tls: true,
+      retryWrites: true,
+      maxPoolSize: 1
+    }
+    client = new MongoClient(mongoUri, options)
     await client.connect()
     const db = client.db('contract_management')
     await db.admin().ping()
