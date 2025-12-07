@@ -66,6 +66,11 @@ export default function AuthPage({ onLoginSuccess }) {
 
   return (
     <div className="auth-container">
+      <div className="auth-header-top">
+        <a href="/admin" className="admin-link-btn">
+          Admin Login →
+        </a>
+      </div>
       <div className="auth-card">
         <h1>{isLogin ? 'User Login' : 'Create Account'}</h1>
         <p className="subtitle">Home Cleaning Service</p>
