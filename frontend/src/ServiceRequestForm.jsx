@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+console.log("ServiceRequestForm rendered");
 
 export default function ServiceRequestForm() {
   const [form, setForm] = useState({
@@ -58,44 +59,62 @@ export default function ServiceRequestForm() {
       return { ok: false, error: String(err) }
     }
   }
+async function handleSubmit(e) {
+  e.preventDefault();
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const payload = { ...form, photos: photos.map(f => f.name) }
-    console.log('Service Request submitted:', payload)
+  console.log("---- SUBMITTING SERVICE REQUEST ----");
+const formData = new FormData();
+for (const key in form) formData.append(key, form[key]);
 
-    const apiBase = import.meta.env.VITE_API_BASE
-    if (apiBase) {
-      setMessage('Sending request to backend...')
-      // ensure we call the serverless path
-      const result = await sendToBackend(payload, `${apiBase.replace(/\/$/, '')}/api`)
-      if (result.ok) {
-        const record = result.body
-        const next = [record, ...saved]
-        setSaved(next)
-        setMessage('Service request submitted to backend successfully.')
-        return
-      } else {
-        setMessage('Backend submit failed — saved locally instead.')
-      }
-    }
+photos.forEach((file) => formData.append("photos", file)); // ⭐ matches multer key
 
-    // fallback: persist to localStorage
-    try {
-      const existing = JSON.parse(localStorage.getItem('serviceRequests') || '[]')
-      const record = { id: Date.now(), createdAt: new Date().toISOString(), ...payload }
-      const next = [record, ...existing]
-      localStorage.setItem('serviceRequests', JSON.stringify(next))
-      setSaved(next)
-      setMessage('Service request saved locally (in browser). Ready to connect to backend.')
-    } catch (err) {
-      console.error('Failed to save request', err)
-      setMessage('Failed to save locally — see console for details.')
-    }
+
+  photos.forEach((file, idx) => {
+    console.log("Adding photo:", idx, file.name);
+    formData.append("photos", file);
+  });
+
+  const api = import.meta.env.VITE_API_BASE?.replace(/\/$/, "");
+  console.log("API BASE:", api);
+
+  if (!api) {
+    console.error("VITE_API_BASE is missing");
+    return;
   }
 
+  console.log("Sending request to:", `${api}/api/requests`);
+
+  const res = await fetch(`${api}/api/requests`, {
+    method: "POST",
+    body: formData,
+  });
+
+  console.log("Response status:", res.status);
+
+  let data;
+  try {
+    data = await res.json();
+    console.log("Response JSON:", data);
+  } catch (err) {
+    console.error("Failed to parse JSON:", err);
+  }
+
+  if (res.ok) {
+    setMessage("Service request submitted successfully!");
+  } else {
+    setMessage("Failed to submit request.");
+  }
+}
+
+
+
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form 
+  className="form" 
+  onSubmit={handleSubmit}
+  encType="multipart/form-data"
+>
+
       <h2>Service Request Submission</h2>
 
       <div className="row">
@@ -159,7 +178,14 @@ export default function ServiceRequestForm() {
 
       <div className="row">
         <label>Upload photos (up to 5)</label>
-        <input type="file" accept="image/*" multiple onChange={handleFiles} />
+        <input 
+  type="file" 
+  accept="image/*" 
+  multiple 
+  name="photos"        // ⭐ MUST MATCH multer.array("photos")
+  onChange={handleFiles} 
+/>
+
         {photos.length > 0 && (
           <div className="photos">
             {photos.map((p, i) => (
