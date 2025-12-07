@@ -83,5 +83,13 @@ app.get('/requests/:id', (req, res) => {
   })
 })
 
+// health endpoint - checks server and DB
+app.get('/health', (req, res) => {
+  db.get('SELECT 1 as ok', (err, row) => {
+    if (err) return res.status(500).json({ status: 'error', db: false, error: String(err) })
+    res.json({ status: 'ok', db: !!row })
+  })
+})
+
 const port = process.env.PORT || 4000
 app.listen(port, () => console.log(`Backend listening on http://localhost:${port}`))
