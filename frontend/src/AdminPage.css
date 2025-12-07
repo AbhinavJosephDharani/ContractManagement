@@ -1,0 +1,17 @@
+.admin-page {
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.admin-page-header {
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+  max-width: 100%;
+}
+
+.admin-page-header a {
+  display: inline-block;
+  font-size: 14px;
+}
+

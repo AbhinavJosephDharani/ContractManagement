@@ -8,15 +8,15 @@
 .admin-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 30px;
+  gap: 20px;
 }
 
 .admin-container h1 {
   color: #2c3e50;
-  margin: 0;
+  margin: 0 0 8px 0;
   font-size: 28px;
-  flex: 1;
 }
 
 .logout-btn {
@@ -29,6 +29,7 @@
   font-weight: 600;
   font-size: 13px;
   transition: background 0.3s;
+  white-space: nowrap;
 }
 
 .logout-btn:hover {

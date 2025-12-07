@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import './AdminDashboard.css'
 
 export default function AdminDashboard({ token, onLogout }) {
@@ -133,7 +134,10 @@ export default function AdminDashboard({ token, onLogout }) {
   return (
     <div className="admin-container">
       <div className="admin-header">
-        <h1>Admin Dashboard - Service Requests</h1>
+        <div>
+          <h1>Admin Dashboard - Service Requests</h1>
+          <Link to="/" style={{fontSize:'13px',color:'#3498db',textDecoration:'none'}}>← Back to Home</Link>
+        </div>
         <button onClick={onLogout} className="logout-btn">Logout</button>
       </div>
       
