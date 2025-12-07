@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './AdminDashboard.css'
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ token, onLogout }) {
   const [requests, setRequests] = useState([])
   const [selectedRequest, setSelectedRequest] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -30,7 +30,9 @@ export default function AdminDashboard() {
         setLoading(false)
         return
       }
-      const res = await fetch(`${apiBase}/api/requests`)
+      const res = await fetch(`${apiBase}/api/requests`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       setRequests(Array.isArray(data) ? data : [])
@@ -59,7 +61,10 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`${apiBase}/api/quotes`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           requestId,
           status: 'rejected',
@@ -94,7 +99,10 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`${apiBase}/api/quotes`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           requestId: selectedRequest._id,
           status: 'quoted',
@@ -124,7 +132,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-container">
-      <h1>Admin Dashboard - Service Requests</h1>
+      <div className="admin-header">
+        <h1>Admin Dashboard - Service Requests</h1>
+        <button onClick={onLogout} className="logout-btn">Logout</button>
+      </div>
       
       <div className="admin-layout">
         {/* Requests List */}

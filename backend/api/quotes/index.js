@@ -1,13 +1,36 @@
 const { MongoClient, ObjectId } = require('mongodb')
+const jwt = require('jsonwebtoken')
 
 const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://<db_username>:<db_password>@cluster0.gwciiyr.mongodb.net/?appName=Cluster0'
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
+
+function verifyToken(req, res) {
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token) {
+    res.status(401).json({ error: 'No token provided' })
+    return null
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET)
+    return decoded
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid or expired token' })
+    return null
+  }
+}
 
 module.exports = async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization')
   if (req.method === 'OPTIONS') return res.status(204).end()
+
+  // Verify token for GET and POST
+  if (req.method !== 'OPTIONS') {
+    const user = verifyToken(req, res)
+    if (!user) return
+  }
 
   let client
   try {
