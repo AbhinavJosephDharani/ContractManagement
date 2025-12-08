@@ -11,6 +11,18 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
+app.get("/", (req, res) => {
+  res.send(`
+    <h1>Backend API is Running ✔</h1>
+    <p>Available routes:</p>
+    <ul>
+      <li>/api/health</li>
+      <li>/api/auth</li>
+      <li>/api/requests</li>
+    </ul>
+  `);
+});
+
 // Health check route
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", storage: true });
