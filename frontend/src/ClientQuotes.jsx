@@ -155,6 +155,9 @@ export default function ClientQuotes({ userToken }) {
                 </div>
               )}
               {/* Bill and Payment */}
+              <pre style={{background:'#fffbe6',color:'#b8860b',padding:'0.5em',borderRadius:'4px',fontSize:'12px',marginBottom:'0.5em'}}>
+                Bills debug: {JSON.stringify(req.bills, null, 2)}
+              </pre>
               {req.bills && req.bills.length > 0 && req.bills.map(bill => (
                 <div key={bill._id} style={{marginTop:'0.5em',padding:'0.5em',background:'#f1f8e9',borderRadius:'4px'}}>
                   <strong>Bill:</strong> Amount: ${bill.amount} — Status: {bill.status}
