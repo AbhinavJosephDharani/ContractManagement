@@ -86,7 +86,7 @@ export default function AdminPage() {
     setAnalyticsError('')
     try {
       const apiBase = import.meta.env.VITE_API_BASE
-      const res = await fetch(`${apiBase}/api/admin/analytics`, {
+      const res = await fetch(`${apiBase}/api/admin/analytics?dummy=1`, {
         headers: adminToken ? { 'Authorization': `Bearer ${adminToken}` } : {}
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
