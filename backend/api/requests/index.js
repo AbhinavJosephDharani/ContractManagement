@@ -1,6 +1,9 @@
+
 const { MongoClient } = require('mongodb')
+const jwt = require('jsonwebtoken')
 
 const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://<db_username>:<db_password>@cluster0.gwciiyr.mongodb.net/?appName=Cluster0'
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
 
 module.exports = async function handler(req, res) {
   // CORS
@@ -28,6 +31,20 @@ module.exports = async function handler(req, res) {
 
     if (req.method === 'POST') {
       const body = req.body || {}
+
+      // Try to get userId from Authorization header (if present)
+      let userId = null
+      const authHeader = req.headers.authorization || req.headers.Authorization
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        try {
+          const token = authHeader.split(' ')[1]
+          const decoded = jwt.verify(token, JWT_SECRET)
+          userId = decoded.userId || null
+        } catch (err) {
+          // Invalid token, ignore userId
+        }
+      }
+
       const record = {
         createdAt: new Date().toISOString(),
         firstName: body.firstName || null,
@@ -41,7 +58,8 @@ module.exports = async function handler(req, res) {
         preferredTime: body.preferredTime || null,
         budget: body.budget || null,
         notes: body.notes || null,
-        photos: Array.isArray(body.photos) ? body.photos : []
+        photos: Array.isArray(body.photos) ? body.photos : [],
+        userId: userId
       }
       const result = await collection.insertOne(record)
       const inserted = { _id: result.insertedId, ...record }
