@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-export default function ServiceRequestForm() {
+export default function ServiceRequestForm({ userToken }) {
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -45,9 +45,11 @@ export default function ServiceRequestForm() {
   async function sendToBackend(payload, apiBaseOverride) {
     try {
       const base = apiBaseOverride || import.meta.env.VITE_API_BASE
+      const headers = { 'Content-Type': 'application/json' }
+      if (userToken) headers['Authorization'] = `Bearer ${userToken}`
       const res = await fetch(`${base.replace(/\/$/, '')}/requests`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload)
       })
       if (!res.ok) throw new Error(await res.text())

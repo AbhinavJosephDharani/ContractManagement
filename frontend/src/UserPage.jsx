@@ -37,7 +37,7 @@ export default function UserPage({ userName, userToken, onLogout }) {
         </div>
 
         <div className="tab-content">
-          {activeTab === 'submit' && <ServiceRequestForm />}
+          {activeTab === 'submit' && <ServiceRequestForm userToken={userToken} />}
           {activeTab === 'quotes' && <ClientQuotes userToken={userToken} />}
         </div>
       </main>
