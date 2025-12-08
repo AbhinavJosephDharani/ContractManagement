@@ -24,7 +24,22 @@ export default function ClientQuotes({ userToken }) {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
-      setRequests(Array.isArray(data) ? data : [])
+      // For each request, fetch negotiation history
+      const requestsWithHistory = await Promise.all(
+        (Array.isArray(data) ? data : []).map(async req => {
+          try {
+            const quotesRes = await fetch(`${apiBase}/api/quotes?requestId=${req._id}`, {
+              headers: { 'Authorization': `Bearer ${userToken}` }
+            })
+            if (!quotesRes.ok) throw new Error('Quotes fetch failed')
+            const quotes = await quotesRes.json()
+            return { ...req, negotiationHistory: quotes }
+          } catch {
+            return { ...req, negotiationHistory: [] }
+          }
+        })
+      )
+      setRequests(requestsWithHistory)
     } catch (err) {
       setError(`Failed to load requests: ${err.message}`)
     } finally {
@@ -111,6 +126,26 @@ export default function ClientQuotes({ userToken }) {
               )}
               {req.status === 'rejected' && (
                 <span style={{marginLeft:'1em',color:'#c0392b'}}>Rejected</span>
+              )}
+              {/* Negotiation History */}
+              {req.negotiationHistory && req.negotiationHistory.length > 0 && (
+                <div style={{marginTop:'0.5em',padding:'0.5em',background:'#f9f9f9',borderRadius:'4px'}}>
+                  <strong>Negotiation History:</strong>
+                  <ul style={{margin:'0.5em 0 0 0',padding:'0 0 0 1em'}}>
+                    {req.negotiationHistory.map((q, idx) => (
+                      <li key={q._id || idx} style={{fontSize:'13px'}}>
+                        <span style={{fontWeight:'bold'}}>{q.status}</span>
+                        {q.price && <> — <span>Price: ${q.price}</span></>}
+                        {q.scheduledDate && <> — <span>Date: {q.scheduledDate}</span></>}
+                        {q.scheduledTime && <> — <span>Time: {q.scheduledTime}</span></>}
+                        {q.note && <> — <span>Note: {q.note}</span></>}
+                        {q.counterNote && <> — <span>Counter: {q.counterNote}</span></>}
+                        {q.rejectionReason && <> — <span>Reason: {q.rejectionReason}</span></>}
+                        {q.createdAt && <> — <span>{new Date(q.createdAt).toLocaleString()}</span></>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </li>
           ))}

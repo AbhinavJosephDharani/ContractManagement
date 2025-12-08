@@ -68,10 +68,11 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid requestId format' })
       }
 
-      // Create quote record
+
+      // Create quote/negotiation record
       const quoteRecord = {
         requestId: requestIdObj,
-        status: status || 'quoted', // 'quoted' or 'rejected'
+        status: status || 'quoted', // quoted, rejected, accepted, renegotiate, canceled, completed
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -83,9 +84,17 @@ module.exports = async function handler(req, res) {
         quoteRecord.scheduledDate = scheduledDate || null
         quoteRecord.scheduledTime = scheduledTime || null
         quoteRecord.note = note || null
+      } else if (status === 'renegotiate') {
+        quoteRecord.counterNote = note || null
+      } else if (status === 'accepted') {
+        quoteRecord.accepted = true
+      } else if (status === 'canceled') {
+        quoteRecord.canceled = true
+      } else if (status === 'completed') {
+        quoteRecord.completed = true
       }
 
-      // Insert quote
+      // Insert quote/negotiation record
       const quoteResult = await quotesCollection.insertOne(quoteRecord)
       const insertedQuote = { _id: quoteResult.insertedId, ...quoteRecord }
 
