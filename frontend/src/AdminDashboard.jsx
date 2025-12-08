@@ -220,7 +220,35 @@ export default function AdminDashboard({ token, onLogout }) {
                 </div>
               </div>
 
-              {(selectedRequest.status === 'rejected' || selectedRequest.status === 'quoted') ? (
+              {selectedRequest.status === 'accepted' ? (
+                <div className="status-message">
+                  <p>Status: <strong>Order Created</strong></p>
+                  <button
+                    onClick={async () => {
+                      setSubmitting(true)
+                      try {
+                        const res = await fetch(`${apiBase}/api/quotes`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                          body: JSON.stringify({ requestId: selectedRequest._id, status: 'completed' })
+                        })
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+                        await fetchRequests()
+                        setSelectedRequest(null)
+                        alert('Order marked as completed!')
+                      } catch (err) {
+                        alert(`Failed to mark as completed: ${err.message}`)
+                      } finally {
+                        setSubmitting(false)
+                      }
+                    }}
+                    disabled={submitting}
+                    className="btn-submit"
+                  >
+                    {submitting ? 'Completing...' : 'Mark as Completed'}
+                  </button>
+                </div>
+              ) : (selectedRequest.status === 'rejected' || selectedRequest.status === 'quoted') ? (
                 <div className="status-message">
                   <p>Status: <strong>{selectedRequest.status}</strong></p>
                   <p>Already processed</p>
