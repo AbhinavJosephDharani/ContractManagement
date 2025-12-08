@@ -36,8 +36,8 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={userToken ? <UserPage userName={userName} onLogout={handleUserLogout} /> : <AuthPage onLoginSuccess={handleUserLogin} />} />
-      <Route path="/user" element={userToken ? <UserPage userName={userName} onLogout={handleUserLogout} /> : <AuthPage onLoginSuccess={handleUserLogin} />} />
+      <Route path="/" element={userToken ? <UserPage userName={userName} userToken={userToken} onLogout={handleUserLogout} /> : <AuthPage onLoginSuccess={handleUserLogin} />} />
+      <Route path="/user" element={userToken ? <UserPage userName={userName} userToken={userToken} onLogout={handleUserLogout} /> : <AuthPage onLoginSuccess={handleUserLogin} />} />
       <Route path="/admin" element={<AdminPage />} />
     </Routes>
   )
