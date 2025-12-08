@@ -33,5 +33,10 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/requests", require("./routes/requests"));
 // (quotes, orders, bills later)
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Backend running on port http://localhost:${PORT}`));
+const PORT = process.env.PORT;
+
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Backend running on port http://localhost:${PORT}`));
+}
+
+module.exports = app;
