@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Contract Management — Backend</title>
+    <style>
+      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;background:#f7fafc;margin:0;padding:24px;color:#111}
+      .card{background:#fff;padding:16px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.04);max-width:900px;margin:8px auto}
+      .header{display:flex;justify-content:space-between;align-items:center}
+      pre{background:#0f172a;color:#e6eef8;padding:12px;border-radius:6px;overflow:auto}
+      .list{margin-top:12px;display:grid;gap:8px}
+      .item{padding:10px;border-radius:6px;border:1px solid #eee;background:#fbfbfd}
+      button{padding:8px 12px;border-radius:6px;border:none;background:#2563eb;color:#fff}
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="header">
+        <h1>Contract Management — Backend</h1>
+        <div>
+          <button id="check">Refresh</button>
+        </div>
+      </div>
+      <p id="status">Checking backend...</p>
+      <section>
+        <h3>Health Response</h3>
+        <pre id="health">-</pre>
+      </section>
+      <section>
+        <h3>Recent Requests (latest 20)</h3>
+        <div id="requests" class="list">Loading…</div>
+      </section>
+    </div>
+
+    <script src="/ui.js"></script>
+  </body>
+</html>
