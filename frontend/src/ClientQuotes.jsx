@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PayBill from './PayBill'
 
 export default function ClientQuotes({ userToken }) {
   const [requests, setRequests] = useState([])
@@ -25,17 +26,23 @@ export default function ClientQuotes({ userToken }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       // For each request, fetch negotiation history
+      // Also fetch bills for each request
       const requestsWithHistory = await Promise.all(
         (Array.isArray(data) ? data : []).map(async req => {
           try {
-            const quotesRes = await fetch(`${apiBase}/api/quotes?requestId=${req._id}`, {
-              headers: { 'Authorization': `Bearer ${userToken}` }
-            })
-            if (!quotesRes.ok) throw new Error('Quotes fetch failed')
-            const quotes = await quotesRes.json()
-            return { ...req, negotiationHistory: quotes }
+            const [quotesRes, billsRes] = await Promise.all([
+              fetch(`${apiBase}/api/quotes?requestId=${req._id}`, {
+                headers: { 'Authorization': `Bearer ${userToken}` }
+              }),
+              fetch(`${apiBase}/api/bills?requestId=${req._id}`, {
+                headers: { 'Authorization': `Bearer ${userToken}` }
+              })
+            ])
+            const quotes = quotesRes.ok ? await quotesRes.json() : []
+            const bills = billsRes.ok ? await billsRes.json() : []
+            return { ...req, negotiationHistory: quotes, bills }
           } catch {
-            return { ...req, negotiationHistory: [] }
+            return { ...req, negotiationHistory: [], bills: [] }
           }
         })
       )
@@ -147,6 +154,15 @@ export default function ClientQuotes({ userToken }) {
                   </ul>
                 </div>
               )}
+              {/* Bill and Payment */}
+              {req.bills && req.bills.length > 0 && req.bills.map(bill => (
+                <div key={bill._id} style={{marginTop:'0.5em',padding:'0.5em',background:'#f1f8e9',borderRadius:'4px'}}>
+                  <strong>Bill:</strong> Amount: ${bill.amount} — Status: {bill.status}
+                  {bill.status !== 'paid' && (
+                    <PayBill bill={bill} userToken={userToken} onPaid={fetchUserRequests} />
+                  )}
+                </div>
+              ))}
             </li>
           ))}
         </ul>
