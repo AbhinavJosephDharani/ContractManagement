@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import ServiceRequestForm from './ServiceRequestForm'
+import ClientQuotes from './ClientQuotes'
 import './UserPage.css'
 
-export default function UserPage({ userName, onLogout }) {
+export default function UserPage({ userName, userToken, onLogout }) {
   const [activeTab, setActiveTab] = useState('submit')
 
   return (
@@ -20,7 +21,25 @@ export default function UserPage({ userName, onLogout }) {
       </header>
 
       <main className="user-container">
-        <ServiceRequestForm />
+        <div className="tabs">
+          <button 
+            className={`tab-btn ${activeTab === 'submit' ? 'active' : ''}`}
+            onClick={() => setActiveTab('submit')}
+          >
+            Submit Request
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'quotes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('quotes')}
+          >
+            My Quotes
+          </button>
+        </div>
+
+        <div className="tab-content">
+          {activeTab === 'submit' && <ServiceRequestForm />}
+          {activeTab === 'quotes' && <ClientQuotes userToken={userToken} />}
+        </div>
       </main>
     </div>
   )
