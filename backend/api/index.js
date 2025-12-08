@@ -7,19 +7,21 @@ const connectDB = require("../config/db");
 const authRoutes = require("../routes/auth");
 const requestRoutes = require("../routes/requests");
 
+// Connect to DB (works in Vercel too)
 connectDB();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.get("/api/health", (req, res) => {
+// Health for Vercel
+app.get("/health", (req, res) => {
   res.json({ status: "ok", storage: true });
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/requests", requestRoutes);
+// REMOVE /api prefix here (Vercel adds /api for you)
+app.use("/auth", authRoutes);
+app.use("/requests", requestRoutes);
 
 module.exports = app;
 module.exports.handler = serverless(app);
