@@ -208,56 +208,6 @@ function ClientQuotes() {
 }
 
 export default ClientQuotes
-                {req.status === 'accepted' && (
-                  <span style={{marginLeft:'1em',color:'#27ae60'}}>Order created</span>
-                )}
-                {req.status === 'canceled' && (
-                  <span style={{marginLeft:'1em',color:'#c0392b'}}>Canceled</span>
-                )}
-                {req.status === 'rejected' && (
-                  <span style={{marginLeft:'1em',color:'#c0392b'}}>Rejected</span>
-                )}
-                {/* Negotiation History */}
-                {req.negotiationHistory && req.negotiationHistory.length > 0 && (
-                  <div style={{marginTop:'0.5em',padding:'0.5em',background:'#f9f9f9',borderRadius:'4px'}}>
-                    <strong>Negotiation History:</strong>
-                    <ul style={{margin:'0.5em 0 0 0',padding:'0 0 0 1em'}}>
-                      {req.negotiationHistory.map((q, idx) => (
-                        <li key={q._id || idx} style={{fontSize:'13px'}}>
-                          <span style={{fontWeight:'bold'}}>{q.status}</span>
-                          {q.price && <> — <span>Price: ${q.price}</span></>}
-                          {q.scheduledDate && <> — <span>Date: {q.scheduledDate}</span></>}
-                          {q.scheduledTime && <> — <span>Time: {q.scheduledTime}</span></>}
-                          {q.note && <> — <span>Note: {q.note}</span></>}
-                          {q.counterNote && <> — <span>Counter: {q.counterNote}</span></>}
-                          {q.rejectionReason && <> — <span>Reason: {q.rejectionReason}</span></>}
-                          {q.createdAt && <> — <span>{new Date(q.createdAt).toLocaleString()}</span></>}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {/* Bill and Payment */}
-                {req.bills && req.bills.length > 0 && req.bills.map(bill => (
-                  <div key={bill._id} style={{marginTop:'0.5em',padding:'0.5em',background:'#f1f8e9',borderRadius:'4px'}}>
-                    <strong>Bill:</strong> Amount: ${bill.amount} — Status: {bill.status}
-                    {bill.status !== 'paid' && (
-                      <PayBill bill={bill} userToken={userToken} onPaid={fetchUserRequests} />
-                    )}
-                  </div>
-                ))}
-              </li>
-            ))}
-          </ul>
-        )
-      ) : (
-        <div style={{marginTop:'2em'}}>
-          <h3>Billing Payment</h3>
-          <ul>
-            {requests.filter(req => req.status === 'accepted' || req.status === 'completed' || req.status === 'quoted').map(req => {
-              // Find latest quoted price
-              const latestQuote = req.negotiationHistory?.filter(q => q.price).sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt))[0]
-              const amount = latestQuote?.price || 0
               return (
                 <li key={req._id} style={{marginBottom:'2em',background:'#f1f8e9',padding:'1em',borderRadius:'6px',maxWidth:400}}>
                   <div><strong>Request:</strong> {req.cleaningType} — {req.address}</div>
