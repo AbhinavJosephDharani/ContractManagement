@@ -208,28 +208,3 @@ function ClientQuotes() {
 }
 
 export default ClientQuotes
-              return (
-                <li key={req._id} style={{marginBottom:'2em',background:'#f1f8e9',padding:'1em',borderRadius:'6px',maxWidth:400}}>
-                  <div><strong>Request:</strong> {req.cleaningType} — {req.address}</div>
-                  <div><strong>Status:</strong> {req.status}</div>
-                  <div><strong>Amount:</strong> ${amount}</div>
-                  {/* Dummy credit card payment form */}
-                  <form style={{marginTop:'1em'}} onSubmit={e => {e.preventDefault();alert('Payment submitted (demo)!')}}>
-                    <label>Name on Card</label>
-                    <input name="name" required style={{width:'100%',marginBottom:'0.5em'}} />
-                    <label>Card Number</label>
-                    <input name="number" required maxLength={16} style={{width:'100%',marginBottom:'0.5em'}} />
-                    <label>Expiry</label>
-                    <input name="expiry" required placeholder="MM/YY" style={{width:'100%',marginBottom:'0.5em'}} />
-                    <label>CVV</label>
-                    <input name="cvv" required maxLength={4} style={{width:'100%',marginBottom:'0.5em'}} />
-                    <button type="submit" style={{background:'#27ae60',color:'white',border:'none',borderRadius:4,padding:'8px 18px',fontWeight:600,fontSize:15,cursor:'pointer'}}>Pay Now</button>
-                  </form>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      )}
-    </div>
-  )
