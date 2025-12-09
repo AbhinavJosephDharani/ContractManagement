@@ -204,4 +204,3 @@ import PayBill from './PayBill'
       )}
     </div>
   )
-}
