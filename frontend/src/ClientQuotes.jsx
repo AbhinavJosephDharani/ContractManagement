@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react'
 import PayBill from './PayBill'
 
 function ClientQuotes() {
+
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showBilling, setShowBilling] = useState(false)
 
+  const userToken = localStorage.getItem('userToken');
   const apiBase = import.meta.env.VITE_API_BASE
 
   useEffect(() => {
