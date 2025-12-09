@@ -208,17 +208,6 @@ function ClientQuotes() {
 }
 
 export default ClientQuotes
-                    <button onClick={() => handleAccept(req._id)} style={{marginLeft:'1em'}}>Accept</button>
-                    <button onClick={() => handleRenegotiate(req._id)} style={{marginLeft:'0.5em'}}>Renegotiate</button>
-                    <button onClick={() => handleCancel(req._id)} style={{marginLeft:'0.5em'}}>Cancel</button>
-                  </>
-                )}
-                {req.status === 'pending' && (
-                  <button onClick={() => handleCancel(req._id)} style={{marginLeft:'1em'}}>Cancel</button>
-                )}
-                {req.status === 'renegotiate' && (
-                  <span style={{marginLeft:'1em',color:'#e67e22'}}>Waiting for admin response</span>
-                )}
                 {req.status === 'accepted' && (
                   <span style={{marginLeft:'1em',color:'#27ae60'}}>Order created</span>
                 )}
