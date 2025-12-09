@@ -57,6 +57,9 @@ function ClientQuotes() {
     }
   }
 
+  if (!userToken) {
+    return <div className="quotes-container"><p style={{color:'red'}}>You are not logged in. Please log in to view your requests.</p></div>;
+  }
   if (loading) return <div className="quotes-container"><p>Loading requests...</p></div>
   if (error) return <div className="quotes-container"><p style={{color:'red'}}>{error}</p></div>
 
